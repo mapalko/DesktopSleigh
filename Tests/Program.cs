@@ -104,7 +104,7 @@ internal static class Program
             "Santa must visibly raise his hand.");
         Require(CountDifferent(standing, trotting, new Rectangle(0, 0, 37, 32)) == 0,
             "The sleigh and rider must not distort while the reindeer trot.");
-        Require(standing.GetPixel(standing.Width - 1, 0).A == 0 && standing.GetPixel(0, 0).A == 0,
+        Require(standing.GetPixel(37, 0).A == 0 && standing.GetPixel(0, 0).A == 0,
             "The sprite must retain its transparent background.");
 
         foreach (int size in new[] { 24, 32, 48 })

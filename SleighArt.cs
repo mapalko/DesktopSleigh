@@ -12,8 +12,6 @@ internal static class SleighArt
     private static readonly Color Red = Color.FromArgb(196, 38, 51);
     private static readonly Color Gold = Color.FromArgb(244, 191, 76);
     private static readonly Color Snow = Color.FromArgb(255, 249, 229);
-    private static readonly Color Brown = Color.FromArgb(157, 94, 49);
-    private static readonly Color Tan = Color.FromArgb(207, 151, 87);
 
     public static Bitmap CreateFrame(int step, bool waving)
     {
@@ -37,50 +35,69 @@ internal static class SleighArt
 
     private static void DrawReindeer(Graphics g, int x, int step, bool lead)
     {
-        void Block(Color color, int left, int top, int width, int height) =>
-            Fill(g, color, x + left, top, width, height);
+        GraphicsState state = g.Save();
+        g.TranslateTransform(x, 0);
+        g.SetClip(new Rectangle(0, 0, 28, Height));
+        Color outline = Color.FromArgb(72, 45, 37);
+        Color coat = Color.FromArgb(170, 105, 54);
+        Color shade = Color.FromArgb(116, 67, 43);
+        Color cream = Color.FromArgb(255, 237, 197);
+        Color red = Color.FromArgb(191, 43, 54);
 
-        // Forked antlers and ears remain legible at the smallest pet size.
-        Block(Outline, 18, 1, 2, 9);
-        Block(Outline, 14, 2, 2, 4);
-        Block(Outline, 15, 5, 5, 2);
-        Block(Outline, 21, 0, 2, 5);
-        Block(Outline, 19, 3, 5, 2);
-        Block(Tan, 18, 3, 1, 5);
-        Block(Outline, 13, 9, 6, 3);
-        Block(Tan, 14, 10, 4, 1);
-        Block(Outline, 18, 8, 7, 8);
-        Block(Brown, 19, 9, 5, 6);
-        Block(Outline, 23, 12, 4, 4);
-        Block(Tan, 23, 13, 3, 2);
-        Block(lead ? Red : Outline, 26, 12, 2, 3);
-        Block(Snow, 22, 10, 2, 2);
-        Block(Outline, 23, 10, 1, 1);
+        Stroke(g, outline, 1, new(19, 8), new(18, 5), new(18, 1));
+        Stroke(g, outline, 1, new(18, 4), new(15, 3), new(14, 1));
+        Stroke(g, outline, 1, new(18, 3), new(21, 1));
+        Stroke(g, outline, 1, new(22, 8), new(24, 5), new(25, 1));
+        Stroke(g, outline, 1, new(24, 4), new(27, 2), new(27, 0));
+        Stroke(g, cream, 1, new(18, 2), new(18, 4));
+        Stroke(g, outline, 2, new(7, 23), new(step == 0 ? 4 : 9, 27), new(step == 0 ? 3 : 8, 30));
+        Stroke(g, outline, 2, new(16, 23), new(step == 0 ? 14 : 20, 27), new(step == 0 ? 13 : 21, 30));
+        Shape(g, coat, outline, new(3, 19), new(5, 17), new(11, 17), new(15, 18), new(16, 15),
+            new(18, 13), new(18, 9), new(20, 8), new(23, 8), new(25, 10), new(24, 12), new(27, 13),
+            new(27, 15), new(23, 16), new(22, 18), new(20, 21), new(18, 24), new(15, 25),
+            new(8, 25), new(5, 24), new(3, 22));
+        Shape(g, Color.FromArgb(221, 163, 91), null, new(5, 18), new(11, 18), new(15, 19), new(15, 20), new(5, 20));
+        Shape(g, shade, null, new(5, 22), new(9, 23), new(16, 23), new(15, 24), new(8, 24), new(5, 23));
+        Shape(g, cream, null, new(19, 15), new(22, 15), new(21, 19), new(18, 23), new(16, 23), new(18, 19));
+        Shape(g, coat, outline, new(18, 10), new(14, 8), new(15, 11), new(18, 12));
+        Stroke(g, cream, 1, new(15, 9), new(17, 10));
+        Fill(g, Color.White, 21, 10, 2, 2);
+        Fill(g, outline, 22, 10, 1, 2);
+        Fill(g, lead ? red : outline, 26, 13, 2, 2);
+        Fill(g, cream, 24, 15, 2, 1);
+        Shape(g, cream, outline, new(3, 19), new(1, 16), new(0, 17), new(1, 20), new(3, 21));
+        Stroke(g, coat, 2, new(6, 23), new(step == 0 ? 8 : 5, 27), new(step == 0 ? 6 : 3, 30));
+        Stroke(g, coat, 2, new(16, 23), new(step == 0 ? 18 : 14, 27), new(step == 0 ? 21 : 15, 30));
+        Fill(g, outline, step == 0 ? 5 : 2, 30, 3, 1);
+        Fill(g, outline, step == 0 ? 20 : 14, 30, 3, 1);
+        Fill(g, red, 12, 18, 2, 6);
+        Fill(g, Gold, 13, 21, 3, 3);
+        Fill(g, outline, 14, 23, 1, 1);
+        g.Restore(state);
+    }
 
-        Block(Outline, 15, 14, 6, 10);
-        Block(Brown, 16, 15, 4, 8);
-        Block(Tan, 19, 17, 1, 5);
-        Block(Outline, 3, 17, 15, 8);
-        Block(Brown, 4, 18, 13, 6);
-        Block(Tan, 5, 18, 10, 2);
-        Block(Outline, 1, 15, 3, 5);
-        Block(Snow, 1, 15, 2, 2);
-        Block(Red, 12, 17, 3, 8);
-        Block(Gold, 13, 21, 3, 3);
-        Block(Outline, 14, 23, 1, 1);
+    private static void Stroke(Graphics g, Color color, float width, params PointF[] points)
+    {
+        using var pen = new Pen(color, width)
+        {
+            StartCap = LineCap.Round,
+            EndCap = LineCap.Round,
+            LineJoin = LineJoin.Round
+        };
+        g.DrawLines(pen, points);
+    }
 
-        int back = step == 1 ? 2 : 5;
-        int front = step == 1 ? 19 : 16;
-        Block(Outline, 6, 24, 2, 3);
-        Block(Outline, Math.Min(6, back), 25, Math.Abs(6 - back) + 2, 2);
-        Block(Outline, back, 26, 2, 4);
-        Block(Brown, back, 26, 1, 3);
-        Block(Outline, back, 29, 4, 2);
-        Block(Outline, 15, 24, 2, 3);
-        Block(Outline, Math.Min(15, front), 25, Math.Abs(15 - front) + 2, 2);
-        Block(Outline, front, 26, 2, 4);
-        Block(Brown, front, 26, 1, 3);
-        Block(Outline, front, 29, 4, 2);
+    private static void Shape(Graphics g, Color fill, Color? outline, params PointF[] points)
+    {
+        using var path = new GraphicsPath();
+        path.AddPolygon(points);
+        using var brush = new SolidBrush(fill);
+        g.FillPath(brush, path);
+        if (outline is Color color)
+        {
+            using var pen = new Pen(color) { LineJoin = LineJoin.Round };
+            g.DrawPath(pen, path);
+        }
     }
 
     private static void DrawSleigh(Graphics g, bool waving)
