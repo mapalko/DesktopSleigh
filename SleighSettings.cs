@@ -1,11 +1,11 @@
 using System.Text.Json;
 
-namespace DesktopDuck;
+namespace DesktopSleigh;
 
-internal sealed class DuckSettings
+internal sealed class SleighSettings
 {
     private static readonly string SettingsDirectory =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DesktopDuck");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DesktopSleigh");
 
     public int Size { get; set; } = 32;
     public int Speed { get; set; } = 28;
@@ -14,7 +14,7 @@ internal sealed class DuckSettings
     public bool AvoidTaskbar { get; set; } = true;
     public string? ScreenName { get; set; }
 
-    public static DuckSettings Load()
+    public static SleighSettings Load()
     {
         string path = Path.Combine(SettingsDirectory, "settings.json");
         if (!File.Exists(path))
@@ -24,20 +24,20 @@ internal sealed class DuckSettings
 
         try
         {
-            DuckSettings settings = JsonSerializer.Deserialize<DuckSettings>(File.ReadAllText(path))
+            SleighSettings settings = JsonSerializer.Deserialize<SleighSettings>(File.ReadAllText(path))
                 ?? throw new JsonException("The settings file is empty.");
             if (settings.Size is not (24 or 32 or 48) || settings.Speed is not (16 or 28 or 48)
                 || settings.VolumeDb is not (0 or -3 or -30))
             {
-                throw new JsonException("The saved duck size, speed or volume is invalid.");
+                throw new JsonException("The saved sleigh size, speed or volume is invalid.");
             }
 
             return settings;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
         {
-            MessageBox.Show($"Couldn't load Desktop Duck's options. Default options will be used.\n\n{exception.Message}",
-                "Desktop Duck", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show($"Couldn't load DesktopSleigh's options. Default options will be used.\n\n{exception.Message}",
+                "DesktopSleigh", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return new();
         }
     }
@@ -54,8 +54,8 @@ internal sealed class DuckSettings
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            MessageBox.Show($"Couldn't save Desktop Duck's options.\n\n{exception.Message}",
-                "Desktop Duck", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show($"Couldn't save DesktopSleigh's options.\n\n{exception.Message}",
+                "DesktopSleigh", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

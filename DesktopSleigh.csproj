@@ -6,9 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <Product>DesktopSleigh</Product>
+    <Description>Santa and his reindeer taking a trip around your desktop.</Description>
+    <ApplicationIcon>Assets\sleigh.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Tests\**\*.cs" />
-    <EmbeddedResource Include="Assets\quack.wav" LogicalName="DesktopDuck.Assets.quack.wav" />
+    <InternalsVisibleTo Include="DesktopSleigh.Checks" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-namespace DesktopDuck;
+namespace DesktopSleigh;
 
 internal readonly record struct EdgePose(double X, double Y, int Rotation);
 
@@ -73,7 +73,7 @@ internal static class EdgePath
         };
     }
 
-    // The local duck faces right: floor -> right wall -> ceiling -> left wall.
+    // The team faces right: floor -> right wall -> ceiling -> left wall.
     public static EdgePose At(double distance, double width, double height)
     {
         width = Math.Max(0, width);

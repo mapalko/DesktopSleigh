@@ -1,4 +1,4 @@
-namespace DesktopDuck;
+namespace DesktopSleigh;
 
 internal static class Program
 {
@@ -6,6 +6,6 @@ internal static class Program
     private static void Main()
     {
         ApplicationConfiguration.Initialize();
-        Application.Run(new DuckForm());
+        Application.Run(new SleighForm());
     }
 }

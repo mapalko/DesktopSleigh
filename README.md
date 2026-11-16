@@ -1,13 +1,50 @@
-# Quack along as ducks walk your desktop
+# DesktopSleigh
 
-Run it and they'll start walking around the edge of the screen.
+Santa's sleigh, pulled by two pixel-art reindeer, takes a trip around the edges of
+your Windows desktop. The reindeer trot together, reins attached, while Santa
+rides behind them with a sleigh full of presents. Every 30 seconds the team
+pauses, Santa waves, and the sleigh bells ring.
 
-<img width="481" height="136" alt="image" src="https://github.com/user-attachments/assets/1f5743b3-fa2c-4e21-b587-d82dd5736133" />
+![Santa and two reindeer, drawn by DesktopSleigh's native renderer](Assets/sleigh-preview.png)
 
-Periodically the leader will stop and turn to quack at the followers to catch up.
+## Run
 
-<img width="509" height="60" alt="image" src="https://github.com/user-attachments/assets/39c931a3-8d80-45ab-8ec3-88ac5f3a2ee3" />
+Requires Windows and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
-Not much else to it.
+```powershell
+dotnet run --project .\DesktopSleigh.csproj
+```
 
-<img width="91" height="242" alt="image" src="https://github.com/user-attachments/assets/1a67635c-e3e0-49bb-91ae-4409fd7a5932" />
+Left-click the team or double-click its tray icon to ring the bells and wave.
+Right-click either for the native options menu: pause/resume, sound and volume,
+speed, three sizes, screen selection, taskbar avoidance, run on startup, and exit.
+The team stays together when turning corners; the original duck flock's
+catch-up stops are now Santa's wave-and-bell stops.
+
+Settings are saved separately from DesktopDuck in
+`%LOCALAPPDATA%\DesktopSleigh\settings.json`. Startup registration also uses its
+own `DesktopSleigh` entry. No images, audio downloads, or third-party packages are
+needed at runtime: the artwork and short bell sound are generated locally.
+
+## Build and checks
+
+```powershell
+dotnet build .\DesktopSleigh.slnx -c Release
+dotnet run --project .\Tests\DesktopSleigh.Checks.csproj -c Release
+dotnet publish .\DesktopSleigh.csproj -c Release -r win-x64 --self-contained true
+```
+
+For a live Windows smoke check that briefly shows the team, exercises pause/resume,
+and closes it automatically, append `-- --smoke` to the checks command. To
+regenerate the preview and icon from the renderer, append `-- --artifacts .`.
+
+Use `win-arm64` instead of `win-x64` for ARM64 Windows. Run the published
+`DesktopSleigh.exe` from the publish directory.
+
+## Credits
+
+A festive fork of [Steve Syfuhs' DesktopDuck](https://github.com/SteveSyfuhs/DesktopDuck),
+retaining its transparent, non-activating desktop-window behavior, screen-edge
+path, and native tray controls. The Santa/reindeer artwork and synthesized bells
+replace the duck artwork and recording. Licensed under the [MIT license](LICENSE);
+the original copyright notice is retained.

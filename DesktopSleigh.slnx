@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DesktopSleigh.csproj" />
+  <Project Path="Tests\DesktopSleigh.Checks.csproj" />
+</Solution>

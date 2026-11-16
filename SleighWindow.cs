@@ -1,18 +1,17 @@
 using System.Drawing.Drawing2D;
 
-namespace DesktopDuck;
+namespace DesktopSleigh;
 
-internal class DuckWindow : Form
+internal class SleighWindow : Form
 {
-    private readonly Bitmap standingFrame = DuckArt.CreateFrame(0, false);
-    private readonly Bitmap walkingFrame = DuckArt.CreateFrame(1, false);
-    private readonly Bitmap quackingFrame = DuckArt.CreateFrame(0, true);
+    private readonly Bitmap standingFrame = CreateCanvasFrame(0, false);
+    private readonly Bitmap walkingFrame = CreateCanvasFrame(1, false);
+    private readonly Bitmap wavingFrame = CreateCanvasFrame(0, true);
     private int rotation;
     private bool isStepping;
-    private bool isQuacking;
-    private bool isFacingBackwards;
+    private bool isWaving;
 
-    public DuckWindow()
+    public SleighWindow()
     {
         FormBorderStyle = FormBorderStyle.None;
         ShowInTaskbar = false;
@@ -24,19 +23,32 @@ internal class DuckWindow : Form
         StartPosition = FormStartPosition.Manual;
     }
 
-    public void UpdateDuck(EdgePose pose, Rectangle bounds, int size, bool stepping,
-        bool quacking = false, bool backwards = false)
+    public void UpdateSleigh(EdgePose pose, Rectangle bounds, int size, bool stepping,
+        bool waving = false)
     {
-        if (ClientSize.Width != size || ClientSize.Height != size)
+        int extent = size * SleighArt.Width / SleighArt.Height;
+        if (ClientSize.Width != extent || ClientSize.Height != extent)
         {
-            ClientSize = new Size(size, size);
+            ClientSize = new Size(extent, extent);
         }
         Location = new Point(bounds.Left + (int)Math.Round(pose.X),
             bounds.Top + (int)Math.Round(pose.Y));
+        RotateFlipType turn = ((pose.Rotation - rotation + 360) % 360) switch
+        {
+            90 => RotateFlipType.Rotate90FlipNone,
+            180 => RotateFlipType.Rotate180FlipNone,
+            270 => RotateFlipType.Rotate270FlipNone,
+            _ => RotateFlipType.RotateNoneFlipNone
+        };
+        if (turn != RotateFlipType.RotateNoneFlipNone)
+        {
+            standingFrame.RotateFlip(turn);
+            walkingFrame.RotateFlip(turn);
+            wavingFrame.RotateFlip(turn);
+        }
         rotation = pose.Rotation;
         isStepping = stepping;
-        isQuacking = quacking;
-        isFacingBackwards = backwards;
+        isWaving = waving;
         Invalidate();
     }
 
@@ -66,17 +78,10 @@ internal class DuckWindow : Form
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
-        Bitmap frame = isQuacking ? quackingFrame : isStepping ? walkingFrame : standingFrame;
+        Bitmap frame = isWaving ? wavingFrame : isStepping ? walkingFrame : standingFrame;
         Graphics graphics = e.Graphics;
         graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
         graphics.PixelOffsetMode = PixelOffsetMode.Half;
-        graphics.TranslateTransform(ClientSize.Width / 2f, ClientSize.Height / 2f);
-        graphics.RotateTransform(rotation);
-        if (isFacingBackwards)
-        {
-            graphics.ScaleTransform(-1, 1);
-        }
-        graphics.TranslateTransform(-ClientSize.Width / 2f, -ClientSize.Height / 2f);
         graphics.DrawImage(frame, ClientRectangle);
 
         if (!TopMost)
@@ -85,13 +90,23 @@ internal class DuckWindow : Form
         }
     }
 
+    private static Bitmap CreateCanvasFrame(int step, bool waving)
+    {
+        // Rotate the pixel grid, not the graphics transform, to avoid fractional-pixel clipping.
+        using Bitmap sprite = SleighArt.CreateFrame(step, waving);
+        var canvas = new Bitmap(SleighArt.Width, SleighArt.Width);
+        using Graphics graphics = Graphics.FromImage(canvas);
+        graphics.DrawImageUnscaled(sprite, 0, SleighArt.Width - SleighArt.Height);
+        return canvas;
+    }
+
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
             standingFrame.Dispose();
             walkingFrame.Dispose();
-            quackingFrame.Dispose();
+            wavingFrame.Dispose();
         }
 
         base.Dispose(disposing);
