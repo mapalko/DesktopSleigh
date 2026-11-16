@@ -5,7 +5,7 @@ namespace DesktopSleigh;
 
 internal static class SleighArt
 {
-    public const int Width = 96;
+    public const int Width = 152;
     public const int Height = 32;
 
     private static readonly Color Outline = Color.FromArgb(65, 36, 35);
@@ -23,11 +23,14 @@ internal static class SleighArt
 
         using (var reins = new Pen(Gold))
         {
-            g.DrawLines(reins, [new(29, 17), new(41, 20), new(54, 18), new(69, 20), new(82, 18)]);
+            g.DrawLines(reins, [new(29, 17), new(41, 20), new(54, 18), new(69, 20),
+                new(82, 18), new(97, 20), new(110, 18), new(125, 20), new(138, 18)]);
         }
 
         DrawReindeer(g, 40, step, false);
-        DrawReindeer(g, 68, 1 - step, true);
+        DrawReindeer(g, 68, 1 - step, false);
+        DrawReindeer(g, 96, step, false);
+        DrawReindeer(g, 124, 1 - step, true);
         DrawSleigh(g, waving);
         return bitmap;
     }

@@ -95,13 +95,16 @@ internal static class Program
         using Bitmap standing = SleighArt.CreateFrame(0, false);
         using Bitmap trotting = SleighArt.CreateFrame(1, false);
         using Bitmap waving = SleighArt.CreateFrame(0, true);
-        Require(CountDifferent(standing, trotting, new Rectangle(40, 23, 56, 9)) > 20,
-            "Both reindeer must animate their legs.");
+        for (int deer = 0; deer < 4; deer++)
+        {
+            Require(CountDifferent(standing, trotting, new Rectangle(40 + deer * 28, 23, 28, 9)) > 10,
+                $"Reindeer {deer + 1} must animate its legs.");
+        }
         Require(CountDifferent(standing, waving, new Rectangle(26, 8, 8, 12)) > 5,
             "Santa must visibly raise his hand.");
         Require(CountDifferent(standing, trotting, new Rectangle(0, 0, 37, 32)) == 0,
             "The sleigh and rider must not distort while the reindeer trot.");
-        Require(standing.GetPixel(95, 0).A == 0 && standing.GetPixel(0, 0).A == 0,
+        Require(standing.GetPixel(standing.Width - 1, 0).A == 0 && standing.GetPixel(0, 0).A == 0,
             "The sprite must retain its transparent background.");
 
         foreach (int size in new[] { 24, 32, 48 })
@@ -111,7 +114,7 @@ internal static class Program
             {
                 window.UpdateSleigh(new(0, 0, rotation), new(0, 0, 1920, 1080), size, true);
                 using Bitmap actual = Render(window);
-                int extent = size * 3;
+                int extent = size * SleighArt.Width / SleighArt.Height;
                 Require(actual.Size == new Size(extent, extent),
                     "The rotation canvas must accommodate the full team at every size.");
                 using var source = new Bitmap(SleighArt.Width, SleighArt.Width);
@@ -140,7 +143,7 @@ internal static class Program
             }
 
             var bounds = new Rectangle(-1920, 40, 1280, 720);
-            int canvas = size * 3;
+            int canvas = size * SleighArt.Width / SleighArt.Height;
             double width = bounds.Width - canvas;
             double height = bounds.Height - canvas;
             double lap = EdgePath.Length(width, height);
@@ -164,24 +167,24 @@ internal static class Program
             icon.Save(output);
         }
 
-        using var sheet = new Bitmap(768, 320);
+        using var sheet = new Bitmap(1024, 320);
         using (Graphics g = Graphics.FromImage(sheet))
         using (var title = new Font("Segoe UI", 22, FontStyle.Bold, GraphicsUnit.Pixel))
         using (var caption = new Font("Segoe UI", 13, FontStyle.Regular, GraphicsUnit.Pixel))
         {
             g.Clear(Color.FromArgb(30, 43, 53));
-            g.FillRectangle(Brushes.WhiteSmoke, 0, 160, 768, 160);
+            g.FillRectangle(Brushes.WhiteSmoke, 0, 160, sheet.Width, 160);
             for (int row = 0; row < 2; row++)
             {
                 using Bitmap frame = SleighArt.CreateFrame(row, row == 1);
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.Half;
-                g.DrawImage(frame, new Rectangle(24, row * 160 + 16, 384, 128));
+                g.DrawImage(frame, new Rectangle(24, row * 160 + 16, frame.Width * 4, frame.Height * 4));
                 Brush text = row == 0 ? Brushes.WhiteSmoke : Brushes.DarkSlateGray;
-                g.DrawString(row == 0 ? "DesktopSleigh" : "A wave from Santa", title, text, 448, row * 160 + 22);
-                g.DrawString("Native pixel art, enlarged 4x", caption, text, 448, row * 160 + 60);
-                g.DrawImage(frame, new Rectangle(448, row * 160 + 100, 96, 32));
-                g.DrawString("Actual size", caption, text, 560, row * 160 + 108);
+                g.DrawString(row == 0 ? "DesktopSleigh" : "A wave from Santa", title, text, 672, row * 160 + 22);
+                g.DrawString("Native pixel art, enlarged 4x", caption, text, 672, row * 160 + 60);
+                g.DrawImage(frame, new Rectangle(672, row * 160 + 100, frame.Width, frame.Height));
+                g.DrawString("Actual size", caption, text, 848, row * 160 + 108);
             }
         }
         sheet.Save(Path.Combine(assets, "sleigh-preview.png"), ImageFormat.Png);

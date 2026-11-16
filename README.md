@@ -1,11 +1,11 @@
 # DesktopSleigh
 
-Santa's sleigh, pulled by two pixel-art reindeer, takes a trip around the edges of
+Santa's sleigh, pulled by four pixel-art reindeer, takes a trip around the edges of
 your Windows desktop. The reindeer trot together, reins attached, while Santa
 rides behind them with a sleigh full of presents. Every 30 seconds the team
 pauses, Santa waves, and the sleigh bells ring.
 
-![Santa and two reindeer, drawn by DesktopSleigh's native renderer](Assets/sleigh-preview.png)
+![Santa and four reindeer, drawn by DesktopSleigh's native renderer](Assets/sleigh-preview.png)
 
 ## Run
 
