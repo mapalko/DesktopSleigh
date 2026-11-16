@@ -61,30 +61,45 @@ internal static class Program
     private static void CheckBells()
     {
         using Stream full = SleighBells.OpenStream();
-        using Stream soft = SleighBells.OpenStream(-30);
         byte[] wave = ReadBytes(full);
-        byte[] quiet = ReadBytes(soft);
         Require(wave.AsSpan(0, 4).SequenceEqual("RIFF"u8)
             && wave.AsSpan(8, 8).SequenceEqual("WAVEfmt "u8)
             && wave.AsSpan(36, 4).SequenceEqual("data"u8), "Bells must be a valid PCM WAV.");
         Require(BinaryPrimitives.ReadInt32LittleEndian(wave.AsSpan(4)) == wave.Length - 8
             && BinaryPrimitives.ReadInt32LittleEndian(wave.AsSpan(40)) == wave.Length - 44,
-            "WAV lengths must match the generated samples.");
-        Require(BinaryPrimitives.ReadInt32LittleEndian(wave.AsSpan(24)) == 22050
-            && wave.Length == 44144, "Bells must contain exactly one second of mono 16-bit PCM.");
+            "WAV lengths must match the complete recorded samples.");
+        int sampleRate = BinaryPrimitives.ReadInt32LittleEndian(wave.AsSpan(24));
+        int byteRate = BinaryPrimitives.ReadInt32LittleEndian(wave.AsSpan(28));
+        Require(sampleRate == 44100
+            && BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(20)) == 1
+            && BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(22)) == 2
+            && BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(34)) == 16
+            && byteRate == sampleRate * 4,
+            "The requested recording must retain its stereo 44.1 kHz PCM16 format.");
+        double duration = (wave.Length - 44) / (double)byteRate;
+        Require(duration is > 4.3 and < 4.4,
+            "The entire requested bell recording must play, not a short synthesized substitute.");
         int peak = 0;
-        int quietPeak = 0;
         for (int i = 44; i < wave.Length; i += 2)
         {
             int sample = BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(i));
-            int quietSample = BinaryPrimitives.ReadInt16LittleEndian(quiet.AsSpan(i));
             peak = Math.Max(peak, Math.Abs(sample));
-            quietPeak = Math.Max(quietPeak, Math.Abs(quietSample));
-            Require(Math.Abs(quietSample - sample * Math.Pow(10, -1.5)) <= 1,
-                "The volume setting must attenuate every sample.");
         }
-        Require(peak > 1000 && peak < short.MaxValue && quietPeak > 0,
-            "Bells must be audible without clipping, even at the quiet setting.");
+        Require(peak > 1000, "The embedded recording must contain audible bell samples.");
+        foreach (int volumeDb in new[] { -3, -30 })
+        {
+            using Stream soft = SleighBells.OpenStream(volumeDb);
+            byte[] quiet = ReadBytes(soft);
+            Require(quiet.Length == wave.Length && quiet.AsSpan(0, 44).SequenceEqual(wave.AsSpan(0, 44)),
+                "Volume changes must preserve the format and the entire recording.");
+            for (int i = 44; i < wave.Length; i += 2)
+            {
+                int sample = BinaryPrimitives.ReadInt16LittleEndian(wave.AsSpan(i));
+                int quietSample = BinaryPrimitives.ReadInt16LittleEndian(quiet.AsSpan(i));
+                Require(Math.Abs(quietSample - sample * Math.Pow(10, volumeDb / 20.0)) <= 1,
+                    "The volume setting must attenuate both channels throughout the recording.");
+            }
+        }
         full.Position = 0;
         using var player = new SoundPlayer(full);
         player.Load();

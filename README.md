@@ -10,4 +10,5 @@ Left-click to ring the bells yourself. Right-click for options.
 [Running, building, and checks](BUILDING.md).
 
 A festive fork of [Steve Syfuhs' DesktopDuck](https://github.com/SteveSyfuhs/DesktopDuck).
-[MIT licensed](LICENSE), with the original copyright notice retained.
+Code is [MIT licensed](LICENSE), with the original copyright notice retained.
+[Bell recording credit and license](Assets/AUDIO-LICENSE.md).

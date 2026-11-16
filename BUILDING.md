@@ -27,7 +27,9 @@ catch-up stops are now Santa's wave-and-bell stops.
 Settings are saved separately from DesktopDuck in
 `%LOCALAPPDATA%\DesktopSleigh\settings.json`. Startup registration also uses its
 own `DesktopSleigh` entry. No images, audio downloads, or third-party packages are
-needed at runtime: the artwork and short bell sound are generated locally.
+needed at runtime: the artwork is drawn locally and the bell recording is
+embedded in the application. The recording is "Bells Jingling 2" by
+DRAGON-STUDIO from Pixabay; see [audio credits and license](Assets/AUDIO-LICENSE.md).
 
 ## Build and checks
 

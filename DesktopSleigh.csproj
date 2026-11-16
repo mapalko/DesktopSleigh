@@ -13,5 +13,7 @@
   <ItemGroup>
     <Compile Remove="Tests\**\*.cs" />
     <InternalsVisibleTo Include="DesktopSleigh.Checks" />
+    <EmbeddedResource Include="Assets\bells-jingling-2.wav" LogicalName="DesktopSleigh.Assets.bells-jingling-2.wav" />
+    <None Update="Assets\AUDIO-LICENSE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
