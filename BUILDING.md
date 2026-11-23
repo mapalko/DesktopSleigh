@@ -42,11 +42,31 @@ For a live Windows smoke check that briefly shows the team, exercises pause/resu
 and closes it automatically, append `-- --smoke` to the checks command. To
 regenerate the preview and icon from the renderer, append `-- --artifacts .`.
 
-## Publish a self-contained executable
+## Publish a standalone, portable Windows x64 executable
 
 ```powershell
-dotnet publish .\DesktopSleigh.csproj -c Release -r win-x64 --self-contained true
+dotnet publish .\DesktopSleigh.csproj -c Release -p:PublishProfile=PortableWinX64
 ```
 
-Use `win-arm64` instead of `win-x64` for ARM64 Windows. Run the published
-`DesktopSleigh.exe` from the publish directory.
+The output is `artifacts\portable-win-x64\DesktopSleigh.exe`. It includes the
+.NET runtime, native libraries, artwork, bell recording, and debug symbols in
+one executable. No .NET installation or installer is needed on the destination
+Windows x64 PC.
+
+Keep the accompanying license notices when distributing it. To package the
+executable and notices:
+
+```powershell
+Compress-Archive -Path .\artifacts\portable-win-x64\* -DestinationPath .\artifacts\DesktopSleigh-win-x64.zip -Force
+```
+
+Extract the ZIP to a folder of your choice and run `DesktopSleigh.exe`. The
+executable runs without dependency DLLs next to it, but may extract bundled
+native libraries into the user's `%TEMP%\.net` cache when needed. That cache
+must be writable; it can be recreated if Windows clears temporary files.
+
+Portable describes deployment, not settings storage: preferences still live in
+`%LOCALAPPDATA%\DesktopSleigh\settings.json`, not beside the EXE or on a USB drive.
+Run on startup remains opt-in and points to the EXE's current location; turn it
+off before moving the EXE, then enable it again from the new location if desired.
+The executable is unsigned, so Windows may show a SmartScreen warning.
